@@ -76,6 +76,7 @@ Function: FUNCTION FuncIdent SEMICOLON BEGIN_PARAMS Declarations END_PARAMS BEGI
             mainFunc = true;
         }
         temp.append($5.code);
+
         std::string decs = $5.code;
         int decNum = 0;
 
@@ -213,7 +214,7 @@ FuncIdent: IDENT
             funcs.insert($1);
         }
         $$.place = strdup($1);
-        $$.place = strdup("");
+        $$.code = strdup("");
     }
 Idents: Ident
     {
@@ -740,6 +741,7 @@ Term: Var
             temp += "= " + dst + ", ";
             temp.append($1.place);
             temp.append("\n");
+            temp.append($1.code);
         }
         if(varTemp.find($1.place) != varTemp.end()){
             varTemp[$1.place] = dst;
@@ -790,24 +792,27 @@ Term: Var
     }
     | Ident L_PAREN Expressions R_PAREN
     {
-        if (functions.find(std::string($1.place)) == functions.end()) {
+        if (funcs.find(std::string($1.place)) == funcs.end()) {
             char temp[128];
             snprintf(temp, 128, "Use of undeclared function %s", $1.place);
             yyerror(temp);
         }
-        $$.place = strdup(new_temp().c_str());
+        //$$.place = strdup(new_temp().c_str());
+
+        std::string t = new_temp();
 
         std::string temp;
         temp.append($3.code);
         temp.append(". ");
-        temp.append($$.place);
+        temp.append(t);
         temp.append("\n");
         temp.append("call ");
         temp.append($1.place);
         temp.append(", ");
-        temp.append($$.place);
+        temp.append(t);
         temp.append("\n");
         
+        $$.code = strdup(t.c_str());
         $$.code = strdup(temp.c_str());
     }
     ;
@@ -881,15 +886,15 @@ Var: Ident
 
 
 std::string new_temp() {
-  static int num = 0;
-  std::string temp = "_t" + std::to_string(num++);
-  return temp;
+  std::string t = "t" + std::to_string(tempCount);
+  tempCount++;
+  return t;
 }
 
 std::string new_label() {
-  static int num = 0;
-  std::string temp = 'L' + std::to_string(num++);
-  return temp;
+  std::string l = "L" + std::to_string(labelCount);
+  labelCount++;
+  return l;
 }
 
 int main(int argc, char **argv) {

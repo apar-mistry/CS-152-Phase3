@@ -1,0 +1,20 @@
+func fibonacci
+. k
+= k, $0
+. t0
+= t0, k
+. t1
+<= t1, t0, 1
+?:= L0, t1
+:= L1
+: L0
+ret 1
+: L1
+. t2
+= t2, k
+. t3
+- t3, t2, 1
+ret t3
+endfunc
+
+ERROR: syntax error at symbol on line 21, col 7
