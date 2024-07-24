@@ -16,12 +16,13 @@
     std::set<std::string> funcs;
     std::set<std::string> reserved {"FUNCTION", "BEGIN_PARAMS", "END_PARAMS", "BEGIN_LOCALS", "END_LOCALS", 
     "BEGIN_BODY", "END_BODY", "INTEGER", "ARRAY", "OF", "IF", "THEN", "ENDIF", "ELSE", "WHILE", "DO", "FOR", "BEGINLOOP", 
-    "ENDLOOP", "CONTINUE", "READ", "WRITE", "TRUE", "FALSE", "RETURN", "SEMICOLON", "COLON", "COMMA", "FuncIdent","Vars", "Expression", "Bool-Expr", "Relation-And-Expr", "Relation-Expr-Inv", "Relation-Expr", "Comp", "Multiplicative-Expr", "Term"};
+    "ENDLOOP", "CONTINUE", "READ", "WRITE", "TRUE", "FALSE", "RETURN", "SEMICOLON", "COLON", "COMMA", "FuncIdent","Vars", "Expression", "Expressions","Bool-Expr", "Relation-And-Expr", "Relation-Expr-Inv", "Relation-Expr", "Comp", "Multiplicative-Expr", "Term"};
     void yyerror(const char* s);
     int yylex();
     int yyparse();
     std::string new_temp();
     std::string new_label();
+    //body of the new_temp/new_label
 %}
 %union{
     int num;
@@ -46,6 +47,7 @@
 %token  INTEGER  ARRAY L_SQUARE_BRACKET R_SQUARE_BRACKET L_PAREN R_PAREN
 %token IF ELSE THEN CONTINUE ENDIF OF READ WRITE DO WHILE FOR
 %token TRUE FALSE
+%token FuncIdent Vars Var Expressions Expression IdentsBoolExpr RelationAndExpr RelationExpr Comp MultiplicativeExpr Term Multiplicative-Expr Relation-Expr Relation-Expr-Inv Bool-Expr
 %right ASSIGN
 %left OR
 %left AND
