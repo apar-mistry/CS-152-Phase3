@@ -1,102 +1,83 @@
-%{
-#include <unistd.h>
-#include "y.tab.h"
+%{   
+  #include "y.tab.h"
+  #include <string>
+
+   int num_lines = 1, num_column = 1;
 %}
-	//DEFINITIONS
 
-	int line = 1, column = 0;
-
-DIGIT [0-9]
-LETTER [a-zA-Z]
-UNDERSCORE _
-COMMENT ##.*\n
+DIGIT    [0-9]
+LETTER   [a-zA-Z]
+ID	 [a-zA-Z][a-zA-Z_0-9]*
 
 %%
-	//RULES
+##[^\n]*              	{/* ignore comments */ num_column += num_lines;}
 
-	/*Reserved Words*/
-function		column = column + yyleng; return FUNCTION;
-beginparams		column = column + yyleng; return BEGIN_PARAMS;
-endparams		column = column + yyleng; return END_PARAMS;
-beginlocals		column = column + yyleng; return BEGIN_LOCALS;
-endlocals		column = column + yyleng; return END_LOCALS;
-beginbody		column = column + yyleng; return BEGIN_BODY;
-endbody			column = column + yyleng; return END_BODY;
-integer			column = column + yyleng; return INTEGER;
-array			column = column + yyleng; return ARRAY;
-of				column = column + yyleng; return OF;
-if				column = column + yyleng; return IF;
-then			column = column + yyleng; return THEN;
-endif			column = column + yyleng; return ENDIF;
-else			column = column + yyleng; return ELSE;
-while			column = column + yyleng; return WHILE;
-do				column = column + yyleng; return DO;
-for				column = column + yyleng; return FOR;
-beginloop		column = column + yyleng; return BEGINLOOP;
-endloop			column = column + yyleng; return ENDLOOP;
-continue		column = column + yyleng; return CONTINUE;
-read			column = column + yyleng; return READ;
-write			column = column + yyleng; return WRITE;
-and				column = column + yyleng; return AND;
-or				column = column + yyleng; return OR;
-not				column = column + yyleng; return NOT;
-true			column = column + yyleng; return TRUE;
-false			column = column + yyleng; return FALSE;
-return			column = column + yyleng; return RETURN;
+"function"              { num_column += yyleng; return FUNCTION; }
+"beginparams"           { num_column += yyleng; return BEGIN_PARAMS; }
+"endparams"             { num_column += yyleng; return END_PARAMS; }
+"beginlocals"           { num_column += yyleng; return BEGIN_LOCALS; }
+"endlocals"             { num_column += yyleng; return END_LOCALS; }
+"beginbody"             { num_column += yyleng; return BEGIN_BODY; }
+"endbody"               { num_column += yyleng; return END_BODY; }
+"integer"               { num_column += yyleng; return INTEGER; }
+"array"                 { num_column += yyleng; return ARRAY; }
+"of"                    { num_column += yyleng; return OF; }
+"if"                    { num_column += yyleng; return IF; }
+"then"                  { num_column += yyleng; return THEN; }
+"endif"                 { num_column += yyleng; return ENDIF; }
+"else"                  { num_column += yyleng; return ELSE; }
+"for"                   { num_column += yyleng; return FOR; }
+"while"                 { num_column += yyleng; return WHILE; }
+"do"                    { num_column += yyleng; return DO; }
+"beginloop"             { num_column += yyleng; return BEGINLOOP; }
+"endloop"               { num_column += yyleng; return ENDLOOP; }
+"continue"              { num_column += yyleng; return CONTINUE; }
+"read"                  { num_column += yyleng; return READ; }
+"write"                 { num_column += yyleng; return WRITE; }
+"and"                   { num_column += yyleng; return AND; }
+"or"                    { num_column += yyleng; return OR; }
+"not"                   { num_column += yyleng; return NOT; }
+"true"                  { num_column += yyleng; return TRUE; }
+"false"                 { num_column += yyleng; return FALSE; }
+"return"                { num_column += yyleng; return RETURN; }
 
-	/*Arithmetic Operators*/
-"-"				column = column + yyleng; return SUB;
-"+"				column = column + yyleng; return ADD;
-"*"				column = column + yyleng; return MULT;
-"/"				column = column + yyleng; return DIV;
-"%"				column = column + yyleng; return MOD;
+"-"                     { num_column += yyleng; return SUB; }
+"+"                     { num_column += yyleng; return ADD; }
+"*"                     { num_column += yyleng; return MULT; }
+"/"                     { num_column += yyleng; return DIV; }
+"%"                     { num_column += yyleng; return MOD; }
 
-	/*Comparison Operators*/
-"=="			column = column + yyleng; return EQ;
-"<>"			column = column + yyleng; return NEQ;
-"<"				column = column + yyleng; return LT;
-">"				column = column + yyleng; return GT;
-"<="			column = column + yyleng; return LTE;
-">="			column = column + yyleng; return GTE;
+"=="                    { num_column += yyleng; return EQ; }
+"!="                    { num_column += yyleng; return NEQ; }
+"<"                     { num_column += yyleng; return LT; }
+"<="                    { num_column += yyleng; return LTE; }
+">"                     { num_column += yyleng; return GT; }
+">="                    { num_column += yyleng; return GTE; }
 
+{LETTER}({LETTER}|{DIGIT}|_)*_ { printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", num_lines, num_column, yytext); exit(1); }
+{ID}+                     { yylval.ident = strdup(yytext); return IDENT; }
+{DIGIT}+                 { yylval.num = atoi(yytext); return NUMBER; }
 
-	/*Other Special Symbols*/
-";"				column = column + yyleng; return SEMICOLON;
-":"				column = column + yyleng; return COLON;
-","				column = column + yyleng; return COMMA;
-"("				column = column + yyleng; return L_PAREN;
-")"				column = column + yyleng; return R_PAREN;
-"["				column = column + yyleng; return L_SQUARE_BRACKET;
-"]"				column = column + yyleng; return R_SQUARE_BRACKET;
-":="			column = column + yyleng; return ASSIGN;
+";"                     { num_column += yyleng; return SEMICOLON; }
+":"                     { num_column += yyleng; return COLON; }
+","                     { num_column += yyleng; return COMMA; }
+"("                     { num_column += yyleng; return L_PAREN; }
+")"                     { num_column += yyleng; return R_PAREN; }
+"["                     { num_column += yyleng; return L_SQUARE_BRACKET; }
+"]"                     { num_column += yyleng; return R_SQUARE_BRACKET; }
+":="                    { num_column += yyleng; return ASSIGN; }
 
-{COMMENT}		++line; //no retun...?
+[ \t]+                  { num_column += yyleng; }
 
+"\n"                    { num_lines++; num_column = 1; }
 
-\n				++line; column = 0; //no retun...?
-" "|\t			 column = column + yyleng; //no retun...?
-
-
-
-
-
-	/*Numbers only*/
-{DIGIT}+		{/*printf("NUMBER %.*s\n", yyleng, yytext);*/ column = column + yyleng; yylval.num = atof(yytext); return NUMBER;}
-
-
-	/* Errors */
-({DIGIT}|{UNDERSCORE})({LETTER}|{DIGIT}|{UNDERSCORE})*		/*printf("Error at line %d, column %d: identifier \"%.*s\" must begin with letter\n", line, column, yyleng, yytext);*/ column = column + yyleng; //exit(1);
-
-({LETTER}|{DIGIT}|{UNDERSCORE})+{UNDERSCORE}		/*printf("Error at line %d, column %d: identifier \"%.*s\" cannot end with underscore\n",line, column, yyleng, yytext);*/ column = column + yyleng; //exit(1);
-
-
-
-	/*Identifiers only*/
-{LETTER}({LETTER}|{DIGIT}|{UNDERSCORE})*			{/*printf("IDENT %.*s\n", yyleng, yytext);*/ column = column + yyleng; yylval.id = strdup(yytext); return IDENT;}
-
-
-	/* More Errors */
-.					/*printf("Error at line %d, column %d: unrecognized symbol \"%.*s\"\n",line, column, yyleng, yytext);*/ //column = column + yyleng; //exit(1);
-
+{DIGIT}{LETTER}({LETTER}|{DIGIT}|_)* {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", num_lines, num_column, yytext); exit(1);}
+.              		{printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", num_lines, num_column, yytext); exit(1);}
 
 %%
+
+		
+
+
+
+
