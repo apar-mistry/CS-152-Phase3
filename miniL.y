@@ -16,7 +16,7 @@
     std::set<std::string> funcs;
     std::set<std::string> reserved {"FUNCTION", "BEGIN_PARAMS", "END_PARAMS", "BEGIN_LOCALS", "END_LOCALS", 
     "BEGIN_BODY", "END_BODY", "INTEGER", "ARRAY", "OF", "IF", "THEN", "ENDIF", "ELSE", "WHILE", "DO", "FOR", "BEGINLOOP", 
-    "ENDLOOP", "CONTINUE", "READ", "WRITE", "TRUE", "FALSE", "RETURN", "SEMICOLON", "COLON", "COMMA", };
+    "ENDLOOP", "CONTINUE", "READ", "WRITE", "TRUE", "FALSE", "RETURN", "SEMICOLON", "COLON", "COMMA", "FuncIdent","Vars", "Expression", "Bool-Expr", "Relation-And-Expr", "Relation-Expr-Inv", "Relation-Expr", "Comp", "Multiplicative-Expr", "Term"};
     void yyerror(const char* s);
     int yylex();
     int yyparse();
@@ -291,3 +291,18 @@ Statement: Var ASSIGN Expression
     }
 
 %%
+
+int main(int argc, char **argv) {
+   if (argc > 1) {
+      yyin = fopen(argv[1], "r");
+      if (yyin == NULL){
+         printf("syntax: %s filename\n", argv[0]);
+      }//end if
+   }//end if
+   yyparse(); // Calls yylex() for tokens.
+   return 0;
+}
+
+void yyerror(const char *msg) {
+   printf("Syntax error at Line %d, position %d: %s\n", num_lines, num_column, msg);
+}
