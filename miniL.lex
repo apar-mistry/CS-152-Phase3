@@ -40,6 +40,7 @@ ID	 [a-zA-Z][a-zA-Z_0-9]*
 "true"                  { num_column += yyleng; return TRUE; }
 "false"                 { num_column += yyleng; return FALSE; }
 "return"                { num_column += yyleng; return RETURN; }
+"enum"                  { num_column += yyleng; return ENUM; }
 
 "-"                     { num_column += yyleng; return SUB; }
 "+"                     { num_column += yyleng; return ADD; }
@@ -56,7 +57,7 @@ ID	 [a-zA-Z][a-zA-Z_0-9]*
 
 {LETTER}({LETTER}|{DIGIT}|_)*_ { printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", num_lines, num_column, yytext); exit(1); }
 {ID}+                     { yylval.ident = strdup(yytext); return IDENT; }
-{DIGIT}+                 { yylval.num = atoi(yytext); return NUMBER; }
+{DIGIT}+                 { yylval.int_val = atoi(yytext); return NUMBER; }
 
 ";"                     { num_column += yyleng; return SEMICOLON; }
 ":"                     { num_column += yyleng; return COLON; }
@@ -67,7 +68,7 @@ ID	 [a-zA-Z][a-zA-Z_0-9]*
 "]"                     { num_column += yyleng; return R_SQUARE_BRACKET; }
 ":="                    { num_column += yyleng; return ASSIGN; }
 
-[ \t]+                  { num_column += yyleng; }
+[\t ]+                  {  }
 
 "\n"                    { num_lines++; num_column = 1; }
 
@@ -77,7 +78,3 @@ ID	 [a-zA-Z][a-zA-Z_0-9]*
 %%
 
 		
-
-
-
-
